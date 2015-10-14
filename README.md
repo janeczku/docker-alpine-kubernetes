@@ -1,7 +1,7 @@
 
 # Alpine-kubernetes
 
-The Alpine-kubernetes base-image is targeted to users wanting to run Alpine Linux in Kubernetes clusters or in other (e.g. Tutum.co) docker hosting environments that rely on resolv.conf SEARCH domain functionality for DNS-based service discovery.
+The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linux in Kubernetes clusters or in other (e.g. Tutum.co) Docker hosting environments that rely on resolv.conf SEARCH domain functionality for DNS-based service discovery.
 
 ## About
 Alpine Linux uses musl-libc and as such does not support the SEARCH keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co).
@@ -9,7 +9,7 @@ Alpine Linux uses musl-libc and as such does not support the SEARCH keyword in r
 To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates glibc's SEARCH path feature.   
 As an added bonus - unlike the native glibc implementation - Alpine-kubernetes does not limit the number of SEARCH paths and nameservers.
     
-Alpine-kubernetes is based on gliderlabs [Alpine base-image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
+Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
 
 -------
 
@@ -17,7 +17,7 @@ Alpine-kubernetes is based on gliderlabs [Alpine base-image](https://github.com/
 
 ## Usage
 
-Alpine-kubernetes can be used as any other base image. Read [these instruction](https://github.com/gliderlabs/docker-alpine#usage) for the specifics of building images based on Alpine Linux.
+Alpine-kubernetes can be used like any other base image. Read [these instruction](https://github.com/gliderlabs/docker-alpine#usage) for the specifics of building Docker images based on Alpine Linux.
 
 **Example - Alpine Docker Redis image:**
 
@@ -27,12 +27,10 @@ RUN apk-install redis
 CMD ["redis-server"]
 ```
 
+*The small print:*    
+You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS-resolver from running.
 
-
-**The small print:**    
-You should NOT redeclare the ENTRYPOINT in your Dockerfile as this would prevent the process manager and the DNS-resolver from running.
-
-### Multi-process docker images
+### Multi-process Docker images
 Creating multi-process containers is absolutely easy thanks to the build-in process manager: Just add  applications as supervised S6 services following the instructions [here](https://github.com/just-containers/s6-overlay#usage).
 
 **Example - Nginx as a supervised service:**
@@ -44,8 +42,9 @@ Create a service script named `run`:
 exec nginx -g "daemon off;" 2>&1 | logger
 ```
 
-*In case you wonder: `2>&1 | logger` effectively redirects Nginx's stdout/stderr to the console making sure that it is visible in `docker logs`.*
-
+*In case you wonder:*     
+`2>&1 | logger` effectively redirects Nginx's stdout/stderr to the console making sure that it is visible in `docker logs`.
+     
 Then in your Dockerfile just copy the service script to the service directory `/etc/services.d/nginx`:
 
 ```Dockerfile
@@ -61,7 +60,7 @@ That's it. Now Nginx will be started as a supervised process by S6 on container 
 
 It is recommended to use the image tagged as 'latest'.
 
-Additionally, images are tagged with the version of the [Alpine docker](http://gliderlabs.com/) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
+Additionally, images are tagged with the version of the [Alpine Docker](http://gliderlabs.com/) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
 
 ## About the DNS-resolver
 
@@ -73,6 +72,6 @@ Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) 
 
 ## Credits
 
-* [Gliderlabs](http://gliderlabs.com/) for providing the [Alpine docker](http://gliderlabs.com/) base-image.
-* [Sillien](http://gliderlabs.com/) for the original idea of creating a base-image dealing with Alpine Linux DNS shortcomings in Tutum/Kubernets clusters: [base-alpine](https://github.com/sillelien/base-alpine/)
+* [Gliderlabs](http://gliderlabs.com/) for providing the [Alpine Docker](http://gliderlabs.com/) base-image.
+* [Sillien](http://gliderlabs.com/) for coming up with the original idea of creating a base image dealing with Alpine Linux's DNS shortcomings in Tutum/Kubernets clusters: [base-alpine](https://github.com/sillelien/base-alpine/)
 
