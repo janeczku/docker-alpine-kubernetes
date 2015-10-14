@@ -19,7 +19,7 @@ Alpine-kubernetes is based on gliderlabs [Alpine base-image](https://github.com/
 
 Alpine-kubernetes can be used as any other base image. Read [these instruction](https://github.com/gliderlabs/docker-alpine#usage) for the specifics of building images based on Alpine Linux.
 
-Example:
+**Example - Alpine Docker Redis image:**
 
 ```Dockerfile
 FROM janeczku/alpine-kubernetes
@@ -33,7 +33,29 @@ CMD ["redis-server"]
 You should NOT redeclare the ENTRYPOINT in your Dockerfile as this would prevent the process manager and the DNS-resolver from running.
 
 ### Multi-process docker images
-Creating multi-process images is absolutely easy thanks to the build-in process manager: Just add multiple applications as supervised S6 services following the instructions [here](https://github.com/just-containers/s6-overlay#usage).
+Creating multi-process containers is absolutely easy thanks to the build-in process manager: Just add  applications as supervised S6 services following the instructions [here](https://github.com/just-containers/s6-overlay#usage).
+
+**Example - Nginx as a supervised service:**
+
+Create a service script named `run`:
+
+```bash
+#!/usr/bin/env sh
+exec nginx -g "daemon off;" 2>&1 | logger
+```
+
+*In case you wonder: `2>&1 | logger` effectively redirects Nginx's stdout/stderr to the console making sure that it is visible in `docker logs`.*
+
+Then in your Dockerfile just copy the service script to the service directory `/etc/services.d/nginx`:
+
+```Dockerfile
+FROM janeczku/alpine-kubernetes
+...
+COPY /run /etc/services.d/nginx/run
+...
+```
+
+That's it. Now Nginx will be started as a supervised process by S6 on container start (No need to define `CMD` in your Dockerfile - alas you still can run another process that way).
 
 ## Docker Hub image tags
 
