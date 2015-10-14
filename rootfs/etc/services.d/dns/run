@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv sh
+exec go-dnsmasq --default-resolver --append-search-domains --hostsfile=/etc/hosts ${DNSMASQ_ARGS} 2>&1 | logger

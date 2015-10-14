@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec syslogd -n -D -O /dev/stdout

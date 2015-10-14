@@ -1,0 +1,20 @@
+main:
+  build: .
+  command: ash -c "sleep 10 && ping -c 1 test1 && ping -c 1 test2 && cat /etc/resolv.conf > /docker-test/test.txt; sleep 10"
+  volumes:
+    - ./docker-test:/docker-test:rw
+  links:
+    - test1
+    - test2
+  environment:
+    - DNSMASQ_ARGS=--verbose
+
+test1:
+  image: nginx
+  ports:
+    - 80
+
+test2:
+  image: nginx
+  ports:
+    - 80
