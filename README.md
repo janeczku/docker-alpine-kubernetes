@@ -69,7 +69,7 @@ That's it. Now Nginx will be started as a supervised process by S6 on container 
 
 It is recommended to use the image tagged as 'latest'.
 
-Additionally, images are tagged with the version of the [Alpine Docker](http://gliderlabs.com/) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
+Additionally, images are tagged with the version of the [Docker Alpine](https://github.com/gliderlabs/docker-alpine) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
  
 ### Configuration
 The behavior of the DNS resolver can be configure by providing environment variables when starting the container. This allows you - inter alia - to specify specific nameservers or search-domains to take precedence over the values in the containers resolv.conf.
@@ -77,6 +77,6 @@ Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) 
 
 ## Credits
 
-* [Gliderlabs](http://gliderlabs.com/) for providing the [Alpine Docker](http://gliderlabs.com/) base-image.
+* [Gliderlabs](http://gliderlabs.com/) for providing the [Alpine Docker](https://github.com/gliderlabs/docker-alpine) base-image.
 * [Sillien](http://gliderlabs.com/) for coming up with the original idea of creating a base image dealing with Alpine Linux's DNS shortcomings in Tutum/Kubernets clusters: [base-alpine](https://github.com/sillelien/base-alpine/)
 
