@@ -10,7 +10,7 @@ Additionally Alpine Linux deviates from the well established GNU libc's logic of
 To overcome this issues Alpine-kubernetes bundles a lightweight (1.15 MB) local DNS-resolver that replicates GNU libc's resolve logic.
 As an added bonus - unlike the native GNU libc resolver - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
 
-Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
+Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead. Additionally it provides a minimal busybox syslogd that makes syslog messages and stdout/stderr of background processes available in `docker logs`.
 
 -------
 
@@ -40,7 +40,7 @@ CMD ["redis-server"]
 You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS resolver from running.
 
 ### Multi-process Docker images
-Creating multi-process containers is absolutely easy thanks to the build-in process manager: Just add  applications as supervised S6 services following the instructions [here](https://github.com/just-containers/s6-overlay#usage).
+Creating multi-process images is absolutely easy thanks to the build-in process supervisor: To add applications as supervised S6 services follow the instructions [here](https://github.com/just-containers/s6-overlay#usage).
 
 **Example - Nginx as a supervised service:**
 
