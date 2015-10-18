@@ -1,7 +1,7 @@
 
 # Alpine-kubernetes
 
-The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linux in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
+The Alpine-kubernetes base image is targeted at cases where Alpine Linux containers are deployed in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
 
 ## About
 Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
