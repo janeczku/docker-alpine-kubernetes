@@ -7,10 +7,10 @@ The Alpine-kubernetes base image is targeted at scenarios where Alpine Linux con
 Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
 Additionally Alpine Linux deviates from the well established GNU libc's logic of always querying the primary DNS server first. Instead it sends parallel queries to all nameservers and returns whatever answer it receives first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome this issues Alpine-kubernetes bundles a lightweight (1.15 MB) local DNS-resolver that replicates GNU libc's resolve logic.
+To overcome this issues Alpine-kubernetes bundles a lightweight (1.15 MB) local DNS resolver that replicates GNU libc's resolve logic.
 As an added bonus - unlike the native GNU libc resolver - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
 
-Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead. Additionally it provides a minimal busybox syslogd that makes syslog messages and stdout/stderr of background processes available in `docker logs`.
+Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS resolver for minimal runtime and filesystem overhead. Additionally it provides a minimal busybox syslogd that makes syslog messages and stdout/stderr of background processes available in `docker logs`.
 
 -------
 
@@ -50,11 +50,8 @@ Create a service script named `run`:
 #!/usr/bin/env sh
 exec nginx -g "daemon off;" 2>&1 | logger
 ```
-
-*In case you wonder:*     
-`2>&1 | logger` effectively redirects Nginx's stdout/stderr to the console making sure that it is visible in `docker logs`.
      
-Then in your Dockerfile just copy the service script to the service directory `/etc/services.d/nginx`:
+In your Dockerfile copy the service script to the service directory `/etc/services.d/nginx`:
 
 ```Dockerfile
 FROM janeczku/alpine-kubernetes
@@ -63,7 +60,7 @@ COPY /run /etc/services.d/nginx/run
 ...
 ```
 
-That's it. Now Nginx will be started as a supervised process by S6 on container start (No need to define `CMD` in your Dockerfile - alas you still can run another process that way).
+That's it. Nginx will be started as a supervised process on container start (No need to define `CMD` in your Dockerfile - alas you still can run another process that way).
 
 ## Docker Hub image tags
 
@@ -77,6 +74,6 @@ Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) 
 
 ## Credits
 
-* [Gliderlabs](http://gliderlabs.com/) for providing the [Alpine Docker](https://github.com/gliderlabs/docker-alpine) base-image.
+* [Gliderlabs](http://gliderlabs.com/) for providing the [Docker Alpine](https://github.com/gliderlabs/docker-alpine) base image.
 * [Sillien](http://gliderlabs.com/) for coming up with the original idea of creating a base image dealing with Alpine Linux's DNS shortcomings in Tutum/Kubernets clusters: [base-alpine](https://github.com/sillelien/base-alpine/)
 
