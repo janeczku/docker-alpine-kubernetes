@@ -4,10 +4,11 @@
 The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linux in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
 
 ## About
-Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).
+Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
+Additionally Alpine Linux deviates from the well established GNU libc's logic of always querying the primary DNS server first. Instead it sends parallel queries to all nameservers and returns whatever answer it receives first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates GNU libc's hostname resolve logic (e.g. suffixing `search` paths, primary/fallback instead of parallel querying of all nameservers).
-As an added bonus - unlike the native glibc implementation - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
+To overcome this issues Alpine-kubernetes bundles a lightweight (1.15 MB) local DNS-resolver that replicates GNU libc's resolve logic.
+As an added bonus - unlike the native GNU libc resolver - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
 
 Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
 
