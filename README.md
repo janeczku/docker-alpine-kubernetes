@@ -28,6 +28,8 @@ On container start the DNS resolver parses the `nameserver` and `search` domains
 
 Alpine-kubernetes can be used like any other base image. Read [these instruction](https://github.com/gliderlabs/docker-alpine#usage) for the specifics of building Docker images based on Alpine Linux.
 
+### Simple Docker image
+
 **Example - Alpine Docker Redis image:**
 
 ```Dockerfile
@@ -39,8 +41,9 @@ CMD ["redis-server"]
 *The small print:*    
 You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS resolver from running.
 
-### Multi-process Docker images
-Creating multi-process images is absolutely easy thanks to the build-in process supervisor: To add applications as supervised S6 services follow the instructions [here](https://github.com/just-containers/s6-overlay#usage).
+### Multi-process Docker image (PID-1 evangelist covereth thy eyes!)
+
+Sometimes you do want to run two or more applications in one container. The built-in process supervisor makes this really easy. While creating supervised S6 services is well documented [here](https://github.com/just-containers/s6-overlay#usage) you could just take a look at the following example to get the idea - because it really is that easy!
 
 **Example - Nginx as a supervised service:**
 
@@ -60,7 +63,7 @@ COPY /run /etc/services.d/nginx/run
 ...
 ```
 
-That's it. Nginx will be started as a supervised process on container start (No need to define `CMD` in your Dockerfile - alas you still can run another process that way).
+That's it. Nginx will be started as a supervised process on container start and its output will be available in `docker logs`.
 
 ## Docker Hub image tags
 
