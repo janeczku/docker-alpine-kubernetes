@@ -6,14 +6,22 @@ The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linu
 ## About
 Alpine Linux uses musl-libc and as such does not support the SEARCH keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co).
     
-To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates glibc's SEARCH path feature.   
+To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates glibc's hostname resolve logic (e.g. using the search paths in the resolv.conf).
 As an added bonus - unlike the native glibc implementation - Alpine-kubernetes does not limit the number of SEARCH paths and nameservers.
-    
+
 Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
 
 -------
 
 [![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:latest.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:latest 'Get your own badge on imagelayers.io') [![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
+
+## How the DNS resolver works
+
+On container start the DNS resolver parses the `nameserver` and `search` domains from the containers /etc/resolv.conf and configures itself as the primary nameserver for the container. When it receives DNS queries from local processes it handles them according to the logic applied by GNU C library's getaddrinfo.c:
+* The first nameserver in resolv.conf is the primary server. It is always queried first.
+* Hostnames are qualified by appending the domains configured by the `search` keyword in resolv.conf
+* Single-label hostnames (e.g.: "redis-master") will always be qualified with search domain paths
+* Multi-label hostnames will first tried as-is and only qualified in case this does not return any records from the upstream server
 
 ## Usage
 
@@ -28,7 +36,7 @@ CMD ["redis-server"]
 ```
 
 *The small print:*    
-You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS-resolver from running.
+You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS resolver from running.
 
 ### Multi-process Docker images
 Creating multi-process containers is absolutely easy thanks to the build-in process manager: Just add  applications as supervised S6 services following the instructions [here](https://github.com/just-containers/s6-overlay#usage).
@@ -61,13 +69,9 @@ That's it. Now Nginx will be started as a supervised process by S6 on container 
 It is recommended to use the image tagged as 'latest'.
 
 Additionally, images are tagged with the version of the [Alpine Docker](http://gliderlabs.com/) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
-
-## About the DNS-resolver
-
-On container start the DNS-resolver reads the NAMESERVERS and SEARCH domains in /etc/resolv.conf and then registers itself as the local resolver. When the resolver receives a single-label DNS query from a process running in the container it will resolve the query by appending the SEARCH domains and querying the appropriate nameservers.
  
 ### Configuration
-The behavior of the DNS-resolver can be changed by providing environment variables when starting the container. This allows you to e.g. specify specific nameservers or search-domains taking precedence over the values in the containers resolv.conf.
+The behavior of the DNS resolver can be configure by providing environment variables when starting the container. This allows you - inter alia - to specify specific nameservers or search-domains to take precedence over the values in the containers resolv.conf.
 Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) to find out what configuration variables can be passed on container start.
 
 ## Credits
