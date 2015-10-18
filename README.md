@@ -1,13 +1,13 @@
 
 # Alpine-kubernetes
 
-The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linux in Kubernetes clusters or in other (e.g. Tutum.co) Docker hosting environments that rely on resolv.conf SEARCH domain functionality for DNS-based service discovery.
+The Alpine-kubernetes base image is targeted to users wanting to run Alpine Linux in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
 
 ## About
-Alpine Linux uses musl-libc and as such does not support the SEARCH keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co).
+Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).
     
-To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates glibc's hostname resolve logic (e.g. using the search paths in the resolv.conf).
-As an added bonus - unlike the native glibc implementation - Alpine-kubernetes does not limit the number of SEARCH paths and nameservers.
+To overcome this issue Alpine-kubernetes comes with a lightweight (1.15 MB) DNS-resolver background process that replicates GNU libc's hostname resolve logic (e.g. suffixing `search` paths, primary/fallback instead of parallel querying of all nameservers).
+As an added bonus - unlike the native glibc implementation - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
 
 Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS-resolver for minimal runtime and filesystem overhead.
 
