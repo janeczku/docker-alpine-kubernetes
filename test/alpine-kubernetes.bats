@@ -1,4 +1,8 @@
-# sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- bash -c "which dig && which nslookup"
+# sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- /bin/sh/bash -c "which dig && which nslookup"
+sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- dig +short +time=1 +tries=1 id.server chaos txt
+sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- /bin/sh -c "nslookup -retry=0 -t=2 -q=txt -class=CHAOS version.bind 127.0.0.1"
+sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- dig +short redis
+docker logs bats-test
 
 setup() {
   docker history alpine-test >/dev/null 2>&1
@@ -10,12 +14,12 @@ setup() {
 }
 
 @test "DNS resolver is accepting requests" {
-  run sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- nslookup -retry=0 -t=2 -q=txt -class=CHAOS version.bind 127.0.0.1
+  run sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- bash -c "nslookup -retry=0 -t=2 -q=txt -class=CHAOS version.bind 127.0.0.1"
   [ $status -eq 0 ]
 }
 
 @test "DNS resolver is configured as default nameserver" {
-  runsudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- dig +short +time=1 +tries=1 id.server chaos txt
+  run sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' bats-test)" -- dig +short +time=1 +tries=1 id.server chaos txt
   [ $status -eq 0 ]
   [ $(expr "$output" : ".*localhost.*") -ne 0 ]
 }

@@ -7,7 +7,7 @@ IMAGE = janeczku/alpine-kubernetes
 TAG = 3.2
 
 define TEST_IMAGE_BODY
-FROM $(IMAGE):$(TAG)-$(BUILD)
+FROM janeczku/alpine-kubernetes:3.2
 RUN apk-install bind-tools
 endef
 
@@ -35,7 +35,9 @@ build-test-image:
 	@echo "$$TEST_IMAGE_BODY" | docker build -t alpine-test -
 
 test: build-test-image
-	docker run -d --name bats-test --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io alpine-test
+	docker run -d --name bats-test --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io alpine-test; sleep 10;
+	docker ps
+	docker logs bats-test
 	bats test/alpine-kubernetes.bats
 
 release: git-tag
