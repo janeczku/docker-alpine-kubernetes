@@ -1,0 +1,27 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/deps"
+  pre:
+    - if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
+#    - mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz;
+    - tar -xf ~/deps/bats_v0.4.0.tar.gz
+    - sudo bats-0.4.0/install.sh /usr/local
+  override:
+    - docker info
+    - make build
+    - docker images
+
+test:
+  override:
+    - make test
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - make release
