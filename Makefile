@@ -1,49 +1,42 @@
 # Makefile for the Docker image janeczku/alpine-kubernetes
 # MAINTAINER: Jan Broer <janeczku@yahoo.com>
 
-.PHONY: all git-tag build release test build-test-image
+.PHONY: all git-tag build release test build-test
 
 IMAGE = janeczku/alpine-kubernetes
 TAG = 3.2
 
-define TEST_IMAGE_BODY
-FROM janeczku/alpine-kubernetes:3.2
-RUN apk-install bind-tools
-endef
-
-export TEST_IMAGE_BODY
-
 ifdef CIRCLE_BUILD_NUM
-BUILD = ${CIRCLE_BUILD_NUM}
+BUILD_NUM = ${CIRCLE_BUILD_NUM}
 else
-BUILD = $(shell git rev-parse --short HEAD)
+BUILD_NUM = $(shell git rev-parse --short HEAD)
 endif
 
 all:
 	@echo "Available targets:"
-	@echo "  * build - build a Docker image for $(IMAGE)"
-	@echo "  * test  - test the image"
-	@echo "  * release  - tag and push to Docker Hub"
-	@echo "  * git-tag  - tag git commit with CIRCLE_BUILD_NUM"
-	@echo $(IMAGE):$(TAG)-$(BUILD)
+	@echo "  * build - build image $(IMAGE):$(TAG)-$(BUILD_NUM)"
+	@echo "  * test  - run integration tests in test-image"
+	@echo "  * release  - git tag build and push to Docker Hub"
+	@echo "  * git-tag  - git tag build"
 
 build:
 	docker build -t $(IMAGE):$(TAG) .
-	docker tag $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD)
+	docker tag $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD_NUM)
+	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
 
-build-test-image:
-	@echo "$$TEST_IMAGE_BODY" | docker build -t alpine-test -
+build-test:
+	docker build -t test-image:$(TAG)-$(BUILD_NUM) -f test/Dockerfile .
 
-test: build-test-image
-	docker run -d --name bats-test --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io alpine-test; sleep 10;
-	docker ps
-	docker logs bats-test
-	bats test/alpine-kubernetes.bats
+test: build-test
+	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 4; cat /etc/resolv.conf"
+	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 4; cat /var/log/s6-uncaught-logs/current; ps aux"
+	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM)
 
 release: git-tag
 	docker push $(IMAGE):$(TAG)
-	docker push $(IMAGE):$(TAG)-$(BUILD)
+	docker push $(IMAGE):$(TAG)-$(BUILD_NUM)
+	docker push $(IMAGE):latest
 
 git-tag:
-	git tag -f $(TAG)-$(BUILD)
+	git tag -f -a $(TAG)-$(BUILD_NUM) -m "Release build for $(TAG)-$(BUILD_NUM)"
 	git push -f --tags
