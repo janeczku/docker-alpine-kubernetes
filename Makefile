@@ -1,10 +1,17 @@
 # Makefile for the Docker image janeczku/alpine-kubernetes
 # MAINTAINER: Jan Broer <janeczku@yahoo.com>
 
-.PHONY: all git-tag build release test
+.PHONY: all git-tag build release test build-test-image
 
 IMAGE = janeczku/alpine-kubernetes
 TAG = 3.2
+
+define TEST_IMAGE_BODY
+FROM $(IMAGE):$(TAG)-$(BUILD)
+RUN apk-install bind-tools
+endef
+
+export TEST_IMAGE_BODY
 
 ifdef CIRCLE_BUILD_NUM
 BUILD = ${CIRCLE_BUILD_NUM}
@@ -24,9 +31,11 @@ build:
 	docker build -t $(IMAGE):$(TAG) .
 	docker tag $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD)
 
-test:
-	docker run -d --name bats-test --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io $(IMAGE):$(TAG)-$(BUILD)
-	docker exec bats-test apk-install bind-tools
+build-test-image:
+	@echo "$$TEST_IMAGE_BODY" | docker build -t alpine-test -
+
+test: build-test-image
+	docker run -d --name bats-test --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io alpine-test
 	bats test/alpine-kubernetes.bats
 
 release: git-tag
