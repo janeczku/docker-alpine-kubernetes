@@ -7,16 +7,16 @@ The Alpine-kubernetes base image is targeted at scenarios where Alpine Linux con
 Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
 Additionally Alpine Linux deviates from the well established GNU libc's logic of always querying the primary DNS server first. Instead it sends parallel queries to all nameservers and returns whatever answer it receives first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome this issues Alpine-kubernetes bundles a lightweight (1.15 MB) local DNS resolver that replicates GNU libc's resolve logic.
+To overcome this issues Alpine-kubernetes provides a lightweight (1.2 MB) local DNS resolver that replicates GNU libc's resolver logic.
 As an added bonus - unlike the native GNU libc resolver - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
 
-Alpine-kubernetes is based on gliderlabs [Docker Alpine image](https://github.com/gliderlabs/docker-alpine) and uses the [S6](http://skarnet.org/software/s6/) process manager and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) DNS resolver for minimal runtime and filesystem overhead. Additionally it provides a minimal busybox syslogd that makes syslog messages and stdout/stderr of background processes available in `docker logs`.
+Alpine-kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.
 
 -------
 
 [![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:latest.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:latest 'Get your own badge on imagelayers.io') [![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
 
-## How the DNS resolver works
+## About the local DNS resolver
 
 On container start the DNS resolver parses the `nameserver` and `search` domains from the containers /etc/resolv.conf and configures itself as the primary nameserver for the container. When it receives DNS queries from local processes it handles them according to the logic applied by GNU C library's getaddrinfo.c:
 * The first nameserver in resolv.conf is the primary server. It is always queried first.
@@ -26,44 +26,19 @@ On container start the DNS resolver parses the `nameserver` and `search` domains
 
 ## Usage
 
-Alpine-kubernetes can be used like any other base image. Read [these instruction](https://github.com/gliderlabs/docker-alpine#usage) for the specifics of building Docker images based on Alpine Linux.
+Building your own image based on Alpine-kubernetes is as easy as typing `FROM janeczku/alpine-kubernetes`.    
+The official Alpine Docker image is well documented, so check out [their documentation](http://gliderlabs.viewdocs.io/docker-alpine) to learn more about building micro Docker images with Alpine Linux.
 
-### Simple Docker image
+*The small print:*    
+Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is used by s6's `init` script.
 
-**Example - Alpine Docker Redis image:**
+### Example Alpine Redis iamge
 
 ```Dockerfile
 FROM janeczku/alpine-kubernetes
 RUN apk-install redis
 CMD ["redis-server"]
 ```
-
-*The small print:*    
-You should NOT redeclare the `ENTRYPOINT` in your Dockerfile as this would prevent the process manager and the DNS resolver from running.
-
-### Multi-process Docker image (PID-1 evangelist covereth thy eyes!)
-
-Sometimes you do want to run two or more applications in one container. The built-in process supervisor makes this really easy. While creating supervised S6 services is well documented [here](https://github.com/just-containers/s6-overlay#usage) you could just take a look at the following example to get the idea - because it really is that easy!
-
-**Example - Nginx as a supervised service:**
-
-Create a service script named `run`:
-
-```bash
-#!/usr/bin/env sh
-exec nginx -g "daemon off;" 2>&1 | logger
-```
-     
-In your Dockerfile copy the service script to the service directory `/etc/services.d/nginx`:
-
-```Dockerfile
-FROM janeczku/alpine-kubernetes
-...
-COPY /run /etc/services.d/nginx/run
-...
-```
-
-That's it. Nginx will be started as a supervised process on container start and its output will be available in `docker logs`.
 
 ## Docker Hub image tags
 
@@ -75,8 +50,8 @@ Additionally, images are tagged with the version of the [Docker Alpine](https://
 The behavior of the DNS resolver can be configure by providing environment variables when starting the container. This allows you - inter alia - to specify specific nameservers or search-domains to take precedence over the values in the containers resolv.conf.
 Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) to find out what configuration variables can be passed on container start.
 
-## Credits
+## Acknowledgement
 
-* [Gliderlabs](http://gliderlabs.com/) for providing the [Docker Alpine](https://github.com/gliderlabs/docker-alpine) base image.
+* [Gliderlabs](http://gliderlabs.com/) for providing the official [Alpine Docker image](https://hub.docker.com/_/alpine/)
 * [Sillien](http://gliderlabs.com/) for coming up with the original idea of creating a base image dealing with Alpine Linux's DNS shortcomings in Tutum/Kubernets clusters: [base-alpine](https://github.com/sillelien/base-alpine/)
 
