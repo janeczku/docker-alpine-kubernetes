@@ -42,12 +42,17 @@ CMD ["redis-server"]
 
 ## Docker Hub image tags
 
-It is recommended to use the image tagged as 'latest'.
+Alpine-Kubernetes image tags follow the official [Alpine Linux image](https://hub.docker.com/_/alpine/).
+To build your images with the latest version of Alpine-Kubernetes that is based on Alpine Linux 3.2 use: 
 
-Additionally, images are tagged with the version of the [Docker Alpine](https://github.com/gliderlabs/docker-alpine) image they are derived from suffixed with a Alpine-kubernetes version number. For example: `3.2.1.0` where  `3.2` is the version of the Alpine Docker base image used and `1.0` is the version of the Alpine-kubernetes image derived from that 3.2 base image.
+```Dockerfile
+FROM janeczku/kubernetes-alpine:3.2
+```
+
+Each release build is also tagged with a static tag. Those have the form of `<Alpine Linux image version>-<Alpine-Kubernetes build number>`, e.g.: `3.2-34`.
  
-### Configuration
-The behavior of the DNS resolver can be configure by providing environment variables when starting the container. This allows you - inter alia - to specify specific nameservers or search-domains to take precedence over the values in the containers resolv.conf.
+### DNS resolver configuration
+The DNS resolver can be configured by providing environment variables via `docker run -e ...`. This allows to specify - inter alia - nameservers or search-domains that take precedence over the values in the containers resolv.conf.     
 Read the documentation for [go-dnsmasg](https://github.com/janeczku/go-dnsmasq) to find out what configuration variables can be passed on container start.
 
 ## Acknowledgement
