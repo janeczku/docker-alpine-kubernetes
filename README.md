@@ -1,7 +1,7 @@
 
 # Alpine-Kubernetes base image
 
-[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)]()
+[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
 
 The Alpine-Kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or other Docker cluster environments that employ DNS-based service discovery and thus rely on the container to use the `search` domains from resolv.conf.
 
