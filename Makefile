@@ -21,14 +21,15 @@ all:
 
 build:
 	docker build -t $(IMAGE):$(TAG) .
-	docker tag $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD_NUM)
-	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
+	docker tag -f $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD_NUM)
+	docker tag -f $(IMAGE):$(TAG) $(IMAGE):latest
 
 build-test:
 	docker build -t test-image:$(TAG)-$(BUILD_NUM) -f test/Dockerfile .
 
 test: build-test
-	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM)
+	docker run -e S6_LOGGING=1 --dns=8.8.4.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /app/bats-tests"
+	docker run -e S6_LOGGING=1 --dns 8.8.4.4 --dns 8.8.8.8 --dns-search google.com --dns-search video.google.com test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /app/bats-tests-more"
 
 release: git-tag
 	docker push $(IMAGE):$(TAG)

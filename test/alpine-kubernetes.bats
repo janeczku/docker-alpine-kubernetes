@@ -17,7 +17,7 @@
 @test "DNS resolver picked up nameserver from resolv.conf" {
   run cat /var/log/s6-uncaught-logs/current
   [ $status -eq 0 ]
-  [ $(expr "$output" : ".*209\.244\.0\.4\:53.*") -ne 0 ]
+  [ $(expr "$output" : ".*8\.8\.4\.4\:53.*") -ne 0 ]
 }
 
 @test "DNS resolver picked up search domain from resolv.conf" {
@@ -26,16 +26,10 @@
   [ $(expr "$output" : ".*10\.0\.0\.1\.xip\.io.*") -ne 0 ]
 }
 
-@test "forwarding is working correctly when search is enabled" {
-  run dig +short 10.0.0.1.xip.io
+@test "forwarding is working correctly" {
+  run dig +short 46.128.179.1.dynamic.cablesurf.de
   [ $status -eq 0 ]
-  [ "$output" = "10.0.0.1" ]
-}
-
-@test "forwarding is working correctly when search is disabled" {
-  run dig +short 10.0.0.1.xip.io
-  [ $status -eq 0 ]
-  [ "$output" = "10.0.0.1" ]
+  [ "$output" = "46.128.179.1" ]
 }
 
 @test "single-label queries are qualified with search domain" {

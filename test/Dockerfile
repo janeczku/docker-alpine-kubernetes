@@ -1,6 +1,7 @@
 FROM janeczku/alpine-kubernetes:3.2
 
 ADD ./test/alpine-kubernetes.bats /app/bats-tests
+ADD ./test/alpine-kubernetes-more.bats /app/bats-tests-more
 ADD ./test/bats-master.zip /tmp/bats.zip
 
 RUN apk-install bind-tools bash \
