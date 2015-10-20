@@ -1,6 +1,8 @@
 
 # Alpine-kubernetes
 
+[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)]()
+
 The Alpine-kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
 
 ## About
@@ -26,7 +28,8 @@ On container start the DNS resolver parses the `nameserver` and `search` domains
 
 ## Usage
 
-Building your own image based on Alpine-kubernetes is as easy as typing `FROM janeczku/alpine-kubernetes`.    
+Building your own image based on Alpine-kubernetes is as easy as typing    
+`FROM janeczku/alpine-kubernetes`.    
 The official Alpine Docker image is well documented, so check out [their documentation](http://gliderlabs.viewdocs.io/docker-alpine) to learn more about building micro Docker images with Alpine Linux.
 
 *The small print:*    
