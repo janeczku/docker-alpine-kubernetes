@@ -1,18 +1,18 @@
 
-# Alpine-kubernetes
+# Alpine-Kubernetes base image
 
 [![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)]()
 
-The Alpine-kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or any other Docker cluster environment that relies on resolv.conf `search` domain handling for DNS-based service discovery.
+The Alpine-Kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or other Docker cluster environments that employ DNS-based service discovery and thus rely on the container to use the `search` domains from resolv.conf.
 
 ## About
 Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
 Additionally Alpine Linux deviates from the well established GNU libc's logic of always querying the primary DNS server first. Instead it sends parallel queries to all nameservers and returns whatever answer it receives first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome this issues Alpine-kubernetes provides a lightweight (1.2 MB) local DNS resolver that replicates GNU libc's resolver logic.
-As an added bonus - unlike the native GNU libc resolver - Alpine-kubernetes does not limit the number of `search` and `nameservers` entries.
+To overcome this issues Alpine-Kubernetes provides a lightweight (1.2 MB) local DNS resolver that replicates GNU libc's resolver logic.
+As an added bonus - unlike the native GNU libc resolver - Alpine-Kubernetes does not limit the number of `search` and `nameservers` entries.
 
-Alpine-kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.
+Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.
 
 -------
 
@@ -28,17 +28,17 @@ On container start the DNS resolver parses the `nameserver` and `search` domains
 
 ## Usage
 
-Building your own image based on Alpine-kubernetes is as easy as typing    
+Building your own image based on Alpine-Kubernetes is as easy as typing    
 `FROM janeczku/alpine-kubernetes`.    
 The official Alpine Docker image is well documented, so check out [their documentation](http://gliderlabs.viewdocs.io/docker-alpine) to learn more about building micro Docker images with Alpine Linux.
 
 *The small print:*    
-Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is used by s6's `init` script.
+Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is in use by s6's `init` script.
 
-### Example Alpine Redis iamge
+### Example Alpine Redis image
 
 ```Dockerfile
-FROM janeczku/alpine-kubernetes
+FROM janeczku/alpine-kubernetes:3.2
 RUN apk-install redis
 CMD ["redis-server"]
 ```
