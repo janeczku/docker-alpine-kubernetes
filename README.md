@@ -33,7 +33,7 @@ Building your own image based on Alpine-Kubernetes is as easy as typing
 The official Alpine Docker image is well documented, so check out [their documentation](http://gliderlabs.viewdocs.io/docker-alpine) to learn more about building micro Docker images with Alpine Linux.
 
 *The small print:*    
-Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is in use by s6's `init` script.
+Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is being used for s6's `init` script.
 
 ### Example Alpine Redis image
 
