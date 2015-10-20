@@ -1,16 +1,14 @@
 machine:
-  timezone:
-    Europe/Berlin
   services:
     - docker
 
 dependencies:
-  cache_directories:
-    - "~/deps"
-  pre:
-    - if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
-    - tar -xf ~/deps/bats_v0.4.0.tar.gz
-    - sudo bats-0.4.0/install.sh /usr/local
+#  cache_directories:
+#    - "~/deps"
+#  pre:
+#    - if [[ ! -e ~/deps/bats_v0.4.0.tar.gz ]]; then mkdir -p ~/deps; curl -sSL -o ~/deps/bats_v0.4.0.tar.gz https://github.com/sstephenson/bats/archive/v0.4.0.tar.gz; fi
+#    - tar -xf ~/deps/bats_v0.4.0.tar.gz
+#    - sudo bats-0.4.0/install.sh /usr/local
   override:
     - docker info
     - make build
@@ -20,12 +18,10 @@ checkout:
     post:
         - git config user.name "Circle CI Build Bot"
         - git config user.email "no-reply@circleci.com"
+        - git remote -v
 
 test:
   override:
-    - make build-test
-    - docker run --name test-image-alpine -d --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:3.2-$CIRCLE_BUILD_NUM
-    - sleep 5; docker logs test-image-alpine
     - make test
 
 deployment:
