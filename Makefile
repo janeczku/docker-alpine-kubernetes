@@ -28,8 +28,6 @@ build-test:
 	docker build -t test-image:$(TAG)-$(BUILD_NUM) -f test/Dockerfile .
 
 test: build-test
-	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 4; cat /etc/resolv.conf"
-	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 4; cat /var/log/s6-uncaught-logs/current; ps aux"
 	docker run -e S6_LOGGING=1 --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM)
 
 release: git-tag

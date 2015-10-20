@@ -12,7 +12,6 @@ dependencies:
     - tar -xf ~/deps/bats_v0.4.0.tar.gz
     - sudo bats-0.4.0/install.sh /usr/local
   override:
-    - docker -v
     - docker info
     - make build
     - docker images
@@ -27,8 +26,6 @@ test:
     - make build-test
     - docker run --name test-image-alpine -d --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:3.2-$CIRCLE_BUILD_NUM
     - sleep 5; docker logs test-image-alpine
-    - sleep 5; docker logs test-image-alpine
-    - docker run --dns=209.244.0.4 --dns-search=10.0.0.1.xip.io test-image:3.2-$CIRCLE_BUILD_NUM /bin/sh -c "sleep 10; ls /etc/services.d/resolver; ps aux"
     - make test
 
 deployment:
