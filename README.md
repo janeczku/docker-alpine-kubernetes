@@ -3,14 +3,13 @@
 
 [![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
 
-The Alpine-Kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or other Docker cluster environments that employ DNS-based service discovery and thus rely on the container to use the `search` domains from resolv.conf.
+The Alpine-Kubernetes base image is targeted at scenarios where Alpine Linux containers are deployed in Kubernetes or other Docker cluster environments that employ DNS-based service discovery and thus rely on the container being able to use the `search` domains from resolv.conf for resolving service names.
 
 ## About
 Alpine Linux uses musl-libc and as such does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).    
-Additionally Alpine Linux deviates from the well established GNU libc's logic of always querying the primary DNS server first. Instead it sends parallel queries to all nameservers and returns whatever answer it receives first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
+Additionally Alpine Linux deviates from the well established pardigm of always querying the primary DNS server first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome this issues Alpine-Kubernetes provides a lightweight (1.2 MB) local DNS resolver that replicates GNU libc's resolver logic.
-As an added bonus - unlike the native GNU libc resolver - Alpine-Kubernetes does not limit the number of `search` and `nameservers` entries.
+To overcome this issues Alpine-Kubernetes provides a lightweight (1.2 MB) local DNS server that replicates GNU libc's resolver logic.
 
 Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasg](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.
 
@@ -20,11 +19,11 @@ Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.co
 
 ## About the local DNS resolver
 
-On container start the DNS resolver parses the `nameserver` and `search` domains from the containers /etc/resolv.conf and configures itself as the primary nameserver for the container. When it receives DNS queries from local processes it handles them according to the logic applied by GNU C library's getaddrinfo.c:
-* The first nameserver in resolv.conf is the primary server. It is always queried first.
+On container start the DNS resolver parses the `nameserver` and `search` entries from the containers /etc/resolv.conf and configures itself as the primary nameserver for the container. When it receives DNS queries from local processes it resolves them according to the following conventions:
+* The nameserver listed first in resolv.conf is the primary server. It is always queried first.
 * Hostnames are qualified by appending the domains configured by the `search` keyword in resolv.conf
-* Single-label hostnames (e.g.: "redis-master") will always be qualified with search domain paths
-* Multi-label hostnames will first tried as-is and only qualified in case this does not return any records from the upstream server
+* Single-label hostnames (e.g.: "redis-master") are always qualified with search domain paths
+* Multi-label hostnames are first tried as absolute names and only qualified with search paths if this does not yield results from the upstream server
 
 ## Usage
 
@@ -52,7 +51,7 @@ To build your images with the latest version of Alpine-Kubernetes that is based 
 FROM janeczku/kubernetes-alpine:3.2
 ```
 
-Each release build is also tagged with a static tag. Those have the form of `<Alpine Linux image version>-<Alpine-Kubernetes build number>`, e.g.: `3.2-34`.
+Each release build is also statically tagged. Those have the form of `<Alpine Linux image version>-<Alpine-Kubernetes build number>`, e.g.: `3.2-34`.
  
 ### DNS resolver configuration
 The DNS resolver can be configured by providing environment variables via `docker run -e ...`. This allows to specify - inter alia - nameservers or search-domains that take precedence over the values in the containers resolv.conf.     
