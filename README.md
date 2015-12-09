@@ -45,6 +45,21 @@ RUN apk-install redis
 CMD ["redis-server"]
 ```
 
+### Optional: Multiple processes in a single container
+
+If you care to run multiple processes in a single container you can leverage s6 supervised services to achieve that. Instructions can be found [here](https://github.com/just-containers/s6-overlay#writing-a-service-script). Since the DNS server itself is a service, any additional services need to be configured to be started **after** the DNS service. This is accomplished by adding the following line to the service script:
+
+> if { s6-svwait -t 5000 -u /var/run/s6/services/resolver }
+
+#### Example service script
+
+```BASH
+#!/usr/bin/execlineb -P
+if { s6-svwait -t 5000 -u /var/run/s6/services/resolver }
+with-contenv
+nginx
+```
+
 ## Docker Hub image tags
 
 Alpine-Kubernetes image tags follow the official [Alpine Linux image](https://hub.docker.com/_/alpine/).
