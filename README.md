@@ -5,6 +5,11 @@
 
 The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-service containers in Kubernetes, Consul, Tutum or other Docker cluster environments that use DNS-based service discovery and rely on the containers being able to use the `search` domains from resolv.conf for resolving service names.
 
+## Supported tags and respective `Dockerfile` links
+
+-	[`3.2` (*versions/3.2/Dockerfile*)](versions/3.2/Dockerfile)
+-	[`3.3`, `latest` (*versions/3.3/Dockerfile*)](versions/3.3/Dockerfile)
+
 ## About
 
 Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasq DNS server](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.    

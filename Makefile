@@ -1,10 +1,11 @@
 # Makefile for the Docker image janeczku/alpine-kubernetes
 # MAINTAINER: Jan Broer <janeczku@yahoo.com>
 
-.PHONY: all git-tag build release test build-test
+.PHONY: all build release test
 
 IMAGE = janeczku/alpine-kubernetes
-TAG = 3.2
+VERSIONS = 3.2 3.3
+VERSION =
 
 ifdef CIRCLE_BUILD_NUM
 BUILD_NUM = ${CIRCLE_BUILD_NUM}
@@ -13,29 +14,43 @@ BUILD_NUM = $(shell git rev-parse --short HEAD)
 endif
 
 all:
+	@echo "Supported versions: $(VERSIONS)"
 	@echo "Available targets:"
-	@echo "  * build - build image $(IMAGE):$(TAG)-$(BUILD_NUM)"
-	@echo "  * test  - run integration tests in test-image"
+	@echo "  * build - build images"
+	@echo "  * test  - run integration tests"
 	@echo "  * release  - git tag build and push to Docker Hub"
-	@echo "  * git-tag  - git tag build"
 
 build:
-	docker build -t $(IMAGE):$(TAG) .
-	docker tag -f $(IMAGE):$(TAG) $(IMAGE):$(TAG)-$(BUILD_NUM)
-	docker tag -f $(IMAGE):$(TAG) $(IMAGE):latest
+	@$(foreach var,$(VERSIONS),$(MAKE) do/build VERSION=$(var);)
+	@$(MAKE) do/tag-latest VERSION=$(word $(words $(VERSIONS)),$(VERSIONS))
 
-build-test:
-	docker build -t test-image:$(TAG)-$(BUILD_NUM) -f test/Dockerfile .
+do/build:
+	@echo "=> building $(IMAGE):$(VERSION)-$(BUILD_NUM)"
+	docker build -t $(IMAGE):$(VERSION) -f versions/$(VERSION)/Dockerfile .
+	docker tag -f $(IMAGE):$(VERSION) $(IMAGE):$(VERSION)-$(BUILD_NUM)
 
-test: build-test
-	docker run -e S6_LOGGING=1 --dns=8.8.4.4 --dns-search=10.0.0.1.xip.io test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /app/bats-tests"
-	docker run -e S6_LOGGING=1 --dns 8.8.4.4 --dns 8.8.8.8 --dns-search google.com --dns-search video.google.com test-image:$(TAG)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /app/bats-tests-more"
+test:
+	@$(foreach var,$(VERSIONS),$(MAKE) do/test VERSION=$(var);)
 
-release: git-tag
-	docker push $(IMAGE):$(TAG)
-	docker push $(IMAGE):$(TAG)-$(BUILD_NUM)
+do/test: do/build-test
+	@echo "=> running tests for $(IMAGE):$(VERSION)-$(BUILD_NUM)"
+	docker run -e S6_LOGGING=1 --dns=8.8.4.4 --dns-search=10.0.0.1.xip.io test-image:$(VERSION)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /tests/bats-tests"
+	docker run -e S6_LOGGING=1 --dns 8.8.4.4 --dns 8.8.8.8 --dns-search google.com --dns-search video.google.com test-image:$(VERSION)-$(BUILD_NUM) /bin/sh -c "sleep 5; /usr/local/bin/bats /tests/bats-tests-more"
+
+do/build-test:
+	docker build -t test-image:$(VERSION)-$(BUILD_NUM) -f tests/dockerfile-test-$(VERSION) .
+
+release: do/git-tag
+	@$(foreach var,$(VERSIONS),$(MAKE) do/release VERSION=$(var);)
 	docker push $(IMAGE):latest
 
-git-tag:
-	git tag -f -a $(TAG)-$(BUILD_NUM) -m "Release build for $(TAG)-$(BUILD_NUM)"
+do/release:
+	docker push $(IMAGE):$(VERSION)
+	docker push $(IMAGE):$(VERSION)-$(BUILD_NUM)
+
+do/git-tag:
+	git tag -f -a build-$(BUILD_NUM) -m "Release CI build $(BUILD_NUM)"
 	git push -f --tags
+
+do/tag-latest:
+	docker tag -f $(IMAGE):$(VERSION) $(IMAGE):latest

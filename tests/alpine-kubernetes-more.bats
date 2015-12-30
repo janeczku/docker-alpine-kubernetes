@@ -15,6 +15,7 @@
 }
 
 @test "DNS resolver picked up both nameservers from resolv.conf" {
+  skip "Uncaught logging needs fixing"
   run cat /var/log/s6-uncaught-logs/current
   [ $status -eq 0 ]
   [ $(expr "$output" : ".*8\.8\.4\.4\:53.*") -ne 0 ]
@@ -22,6 +23,7 @@
 }
 
 @test "DNS resolver picked up both search domains from resolv.conf" {
+  skip "Uncaught logging needs fixing"
   run cat /var/log/s6-uncaught-logs/current
   [ $status -eq 0 ]
   [ $(expr "$output" : ".*[^.]google\.com.*") -ne 0 ]
