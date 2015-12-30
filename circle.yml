@@ -22,6 +22,6 @@ deployment:
   hub:
     branch: master
     commands:
-      - $DEPLOY_TO_HUB
+      - curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/janeczku/alpine-kubernetes/trigger/$HUB_TRIGGER_TOKEN/
       #- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       #- make release
