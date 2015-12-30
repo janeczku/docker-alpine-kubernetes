@@ -40,7 +40,7 @@ do/test: do/build-test
 do/build-test:
 	docker build -t test-image:$(VERSION)-$(BUILD_NUM) -f tests/dockerfile-test-$(VERSION) .
 
-release: do/git-tag
+release: git-tag
 	@$(foreach var,$(VERSIONS),$(MAKE) do/release VERSION=$(var);)
 	docker push $(IMAGE):latest
 
@@ -48,7 +48,7 @@ do/release:
 	docker push $(IMAGE):$(VERSION)
 	docker push $(IMAGE):$(VERSION)-$(BUILD_NUM)
 
-do/git-tag:
+git-tag:
 	git tag -f -a build-$(BUILD_NUM) -m "Release CI build $(BUILD_NUM)"
 	git push -f --tags
 
