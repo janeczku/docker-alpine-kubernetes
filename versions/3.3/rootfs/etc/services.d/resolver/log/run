@@ -1,0 +1,2 @@
+#!/usr/bin/execlineb -P
+logutil-service /var/log/go-dnsmasq
