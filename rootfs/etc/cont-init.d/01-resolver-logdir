@@ -1,0 +1,5 @@
+#!/usr/bin/execlineb -P
+
+if { s6-mkdir -p /var/log/go-dnsmasq }  
+if { s6-envuidgid -D 32768:32768 nobody s6-chown -U /var/log/go-dnsmasq }
+if { s6-chmod 2700 /var/log/go-dnsmasq }

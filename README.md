@@ -3,7 +3,7 @@
 
 [![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
 
-The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-service containers in Kubernetes, Consul, Tutum or other Docker cluster environments that use DNS-based service discovery and rely on the containers being able to use the `search` domains from resolv.conf for resolving service names.
+The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-service containers in Kubernetes, Consul, Tutum or other Docker cluster environments that use DNS-based service discovery and rely on the containers being able to use the `search` keyword from `resolv.conf` to resolve service names.
 
 ## Supported tags and respective `Dockerfile` links
 
@@ -12,7 +12,7 @@ The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-servic
 
 ## About
 
-Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasq DNS server](https://github.com/janeczku/go-dnsmasq). Both s6 and go-dnsmasq introduce very minimal runtime and filesystem overhead.    
+Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasq DNS server](https://github.com/janeczku/go-dnsmasq). Both s6 overlay and go-dnsmasq introduce very minimal runtime and filesystem overhead.    
 Trusted builds are available on [Docker Hub](https://hub.docker.com/r/janeczku/alpine-kubernetes/).
 
 -------
@@ -21,17 +21,17 @@ Trusted builds are available on [Docker Hub](https://hub.docker.com/r/janeczku/a
 [![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
 
 ## Motivation
-Alpine Linux does not support the `search` keyword in resolv.conf. This absolutely breaks things in environments that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).
-Additionally Alpine Linux deviates from the well established pardigm of always querying the primary DNS server first. This introduces problems in cases where the host is configured with multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
+Alpine Linux does not support the `search` keyword in resolv.conf. This breaks many tools that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).
+Additionally Alpine Linux deviates from the well established pardigm of always querying the primary DNS server first. This introduces problems in cases where the container has multiple nameserver with inconsistent records (e.g. one Consul server and one recursing server).
     
-To overcome these issues the Alpine-Kubernetes base image embeds a lightweight (1.2 MB) container-only DNS server that replicates GNU libc's resolver logic and enables processes running in the container to correctly resolve service names.
+To overcome these issues the Alpine-Kubernetes base image includes a lightweight (1.2 MB) container-only DNS server that replicates the behavior of GNU libc's stub-resolver.
 
 ## How it works
-The embedded DNS server acts as the nameserver for processes running in the container. On container start it parses the `nameserver` and `search` entries from the containers /etc/resolv.conf and then answers DNS queries according to the following conventions:
+On container start the embedded DNS server parses the `nameserver` and `search` entries from /etc/resolv.conf and configures itself as primary nameserver for the container. DNS queries from local processes are answered according to the following conventions:
 * The nameserver listed first in resolv.conf is the primary server. It is always queried first.
 * Hostnames are qualified by appending the domains configured by the `search` keyword in resolv.conf
-* Single-label hostnames (e.g.: "redis-master") are always qualified with search domain paths
-* Multi-label hostnames are first tried as absolute names and only qualified with search paths if this does not yield results from the upstream server
+* Single-label hostnames (e.g.: "redis-master") are always qualified with search domains
+* Multi-label hostnames are first tried as absolute names and only qualified with search domains if this does not yield results from the upstream server
 
 ## Usage
 
@@ -44,14 +44,14 @@ Do NOT redeclare the `ENTRYPOINT` in your Dockerfile as this is reserved for the
 ### Example Alpine Redis image
 
 ```Dockerfile
-FROM janeczku/alpine-kubernetes:3.2
+FROM janeczku/alpine-kubernetes:3.3
 RUN apk-install redis
 CMD ["redis-server"]
 ```
 
-### Optional: Multiple processes in a single container
+### Multiple processes in a single container (optional)
 
-If you care to run multiple processes in a single container you can leverage s6 supervised services for that. Instructions can be found [here](https://github.com/just-containers/s6-overlay#writing-a-service-script). Since the container DNS server itself is a service, any additional services need to be configured to start **after** the DNS service. This is accomplished by adding the following line to the service script:
+You can leverage s6 supervised services to run multiple processes in a single container. Instructions can be found [here](https://github.com/just-containers/s6-overlay#writing-a-service-script). Since the container DNS server itself is a service, any additional services need to be configured to start **after** the DNS service. This is accomplished by adding the following line to the service script:
 
 > if { s6-svwait -t 5000 -u /var/run/s6/services/resolver }
 
@@ -67,14 +67,14 @@ nginx
 ## Docker Hub image tags
 
 Alpine-Kubernetes image tags follow the official [Alpine Linux image](https://hub.docker.com/_/alpine/). See the top of this page for the currently available versions.
-To build your images with the latest version of Alpine-Kubernetes that is based on Alpine Linux 3.2 use: 
+To build your images with the latest version of Alpine-Kubernetes that is based on Alpine Linux 3.3 use: 
 
 ```Dockerfile
-FROM janeczku/alpine-kubernetes:3.2
+FROM janeczku/alpine-kubernetes:3.3
 ```
 
-### DNS server configuration (optional)
-The go-dnsmasq DNS server is configurable by setting environment variables either at runtime with `docker run -e ...` or from within the Dockerfile.
+### Container DNS server configuration (optional)
+The configuration of the go-dnsmasq DNS server can be changed by setting environment variables either at runtime with `docker run -e ...` or in the Dockerfile.
 Check out the [documentation](https://github.com/janeczku/go-dnsmasq) for the available configuration options.
 
 ## Acknowledgement

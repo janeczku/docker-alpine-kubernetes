@@ -1,5 +1,0 @@
-#!/usr/bin/execlineb -P
-
-with-contenv
-fdmove -c 2 1
-go-dnsmasq --default-resolver --append-search-domains --hostsfile=/etc/hosts
