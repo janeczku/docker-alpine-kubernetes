@@ -16,8 +16,7 @@ Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.co
 Trusted builds are available on [Docker Hub](https://hub.docker.com/r/janeczku/alpine-kubernetes/).
 
 -------
-
-[![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:latest.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:latest 'Get your own badge on imagelayers.io') 
+[![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:3.3.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3 'Get your own badge on imagelayers.io')
 [![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
 
 ## Motivation
