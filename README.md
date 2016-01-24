@@ -10,15 +10,14 @@ The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-servic
 -	[`3.2` (*versions/3.2/Dockerfile*)](versions/3.2/Dockerfile)
 -	[`3.3`, `latest` (*versions/3.3/Dockerfile*)](versions/3.3/Dockerfile)
 
+-------
+[![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:3.3.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3 'Get your own badge on imagelayers.io')
+[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
+
 ## About
 
-Alpine-Kubernetes is based on the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasq DNS server](https://github.com/janeczku/go-dnsmasq). Both s6 overlay and go-dnsmasq introduce very minimal runtime and filesystem overhead.    
+Alpine-Kubernetes is derived from the official [Docker Alpine](https://hub.docker.com/_/alpine/) image adding the excellent [s6 supervisor for containers](https://github.com/just-containers/s6-overlay) and [go-dnsmasq DNS server](https://github.com/janeczku/go-dnsmasq). Both s6 overlay and go-dnsmasq introduce very minimal runtime and filesystem overhead.    
 Trusted builds are available on [Docker Hub](https://hub.docker.com/r/janeczku/alpine-kubernetes/).
-
--------
-
-[![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:latest.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:latest 'Get your own badge on imagelayers.io') 
-[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
 
 ## Motivation
 Alpine Linux does not support the `search` keyword in resolv.conf. This breaks many tools that rely on DNS service discovery (e.g. Kubernetes, Tutum.co, Consul).
