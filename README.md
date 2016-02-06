@@ -66,14 +66,9 @@ nginx
 ## Docker Hub image tags
 
 Alpine-Kubernetes image tags follow the official [Alpine Linux image](https://hub.docker.com/_/alpine/). See the top of this page for the currently available versions.
-To build your images with the latest version of Alpine-Kubernetes that is based on Alpine Linux 3.3 use: 
 
-```Dockerfile
-FROM janeczku/alpine-kubernetes:3.3
-```
-
-### Container DNS server configuration (optional)
-The configuration of the go-dnsmasq DNS server can be changed by setting environment variables either at runtime with `docker run -e ...` or in the Dockerfile.
+### DNS resolver configuration (optional)
+The configuration of the included go-dnsmasq DNS server can be changed by setting environment variables either at runtime with `docker run -e ...` or in the Dockerfile.
 Check out the [documentation](https://github.com/janeczku/go-dnsmasq) for the available configuration options.
 
 ## Acknowledgement
