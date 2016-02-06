@@ -48,6 +48,38 @@ RUN apk-install redis
 CMD ["redis-server"]
 ```
 
+### Caveat: Kubernetes multi-container pods
+
+> All containers within a pod behave as if they are on the same host with regard to networking. They can all reach each other’s ports on localhost.
+
+(Source: [Kubernetes Networking](https://github.com/kubernetes/kubernetes/blob/master/docs/design/networking.md#container-to-container))
+
+This means there can be only one container per pod running a DNS server on localhost. If your pod spec contains more than one containers based on the Alpine-Kubernetes base image, you need to disable the local DNS server for all but one of them.
+This can be achieved by setting the environment variable `ALPINE_NO_RESOLVER`. Any container set to this env var will 
+use an existing DNS service on localhost as it's nameserver.
+
+```YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis_django
+  labels:
+    app: web
+spec:
+  containers:
+    - name: key-value-store           # On this container the DNS server will bind to localhost as usual
+      image: alpine-kubernetes-redis
+      ports:
+        - containerPort: 6379
+    - name: frontend                  # This container will just have it's nameserver set to localhost
+      image: alpine-kubernetes-django
+      ports:
+        - containerPort: 8000
+      env:
+        - name: ALPINE_NO_RESOLVER
+          value: True
+```
+
 ### Multiple processes in a single container (optional)
 
 You can leverage s6 supervised services to run multiple processes in a single container. Instructions can be found [here](https://github.com/just-containers/s6-overlay#writing-a-service-script). Since the container DNS server itself is a service, any additional services need to be configured to start **after** the DNS service. This is accomplished by adding the following line to the service script:
