@@ -1,9 +1,9 @@
 
 # Alpine-Kubernetes base image
 
-[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg?style=flat-square)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
-[![Imagelayers](https://badge.imagelayers.io/janeczku/alpine-kubernetes:3.3.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3 'Get your own badge on imagelayers.io')
-[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?style=flat-square)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
+[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
+[![ImageLayers Size](https://img.shields.io/imagelayers/image-size/janeczku/alpine-kubernetes/3.3.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3)
+[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
 
 The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-service containers in Kubernetes, Consul, Tutum or other Docker cluster environments that use DNS-based service discovery and rely on the containers ability to qualify service names using the `search` domains from `resolv.conf`.
 
