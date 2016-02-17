@@ -5,7 +5,7 @@ MAINTAINER Jan Broer <janeczku@yahoo.com>
 ## S6 Overlay && go-dnsmasq
 ##
 
-ENV S6_VERSION=v1.17.1.1 GODNSMASQ_VERSION=0.9.8
+ENV S6_VERSION=v1.17.1.1 GODNSMASQ_VERSION=1.0.0
 
 RUN apk add --update wget \
 	&& wget https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-amd64.tar.gz --no-check-certificate --quiet -O /tmp/s6-overlay.tar.gz \
