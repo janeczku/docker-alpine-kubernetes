@@ -48,7 +48,8 @@ RUN apk-install redis
 CMD ["redis-server"]
 ```
 
-### Caveat: Kubernetes multi-container pods
+### Caveats
+#### Kubernetes multi-container pods
 
 > All containers within a pod behave as if they are on the same host with regard to networking. They can all reach each other’s ports on localhost.
 
@@ -78,6 +79,16 @@ spec:
       env:
         - name: ALPINE_NO_RESOLVER
           value: True
+```
+
+#### Docker 1.10 user-defined networks
+When you deploy containers with Docker Engine 1.10 and a user-defined network (non-bridge network) then Docker runs an embedded DNS service for container discovery instead of writing references of linked containers in `/etc/hosts`. In order to make Alpine-Kubernetes work with this setup you need to the pass the environment variable `DNSMASQ_NDOTS` with a value of `1` to your containers or declare it in the image:
+
+```Dockerfile
+FROM janeczku/alpine-kubernetes:3.3
+ENV DNSMASQ_NDOTS=1
+RUN apk-install redis
+CMD ["redis-server"]
 ```
 
 ### Multiple processes in a single container (optional)
