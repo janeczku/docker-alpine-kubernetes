@@ -81,16 +81,6 @@ spec:
           value: True
 ```
 
-#### Docker 1.10 user-defined networks
-When you deploy containers with Docker Engine 1.10 and a user-defined network (non-bridge network) then Docker runs an embedded DNS service for container discovery instead of writing references of linked containers in `/etc/hosts`. In order to make Alpine-Kubernetes work with this setup you need to the pass the environment variable `DNSMASQ_FWD_NDOTS` with a value of `0` to your containers or declare it in the image:
-
-```Dockerfile
-FROM janeczku/alpine-kubernetes:3.3
-ENV DNSMASQ_FWD_NDOTS=0
-RUN apk-install redis
-CMD ["redis-server"]
-```
-
 ### Multiple processes in a single container (optional)
 
 You can leverage s6 supervised services to run multiple processes in a single container. Instructions can be found [here](https://github.com/just-containers/s6-overlay#writing-a-service-script). Since the container DNS server itself is a service, any additional services need to be configured to start **after** the DNS service. This is accomplished by adding the following line to the service script:
