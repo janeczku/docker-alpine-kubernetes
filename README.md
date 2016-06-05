@@ -1,9 +1,14 @@
 
 # Alpine-Kubernetes base image
 
-[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg)](https://circleci.com/gh/janeczku/docker-alpine-kubernetes)
-[![ImageLayers Size](https://img.shields.io/imagelayers/image-size/janeczku/alpine-kubernetes/3.3.svg)](https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3)
-[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg)](https://hub.docker.com/r/janeczku/alpine-kubernetes/)
+[![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg)][circleci]
+[![ImageLayers Size](https://img.shields.io/badge/ImageLayers-5%20MB%20%2F%206%20Layers-blue.svg?maxAge=2592000)][imagelayers]
+[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?maxAge=2592000)][hub]
+[![License](https://img.shields.io/github/license/janeczku/docker-alpine-kubernetes.svg?maxAge=2592000)]()
+
+[circleci]: https://circleci.com/gh/janeczku/docker-alpine-kubernetes
+[hub]: https://hub.docker.com/r/janeczku/alpine-kubernetes/
+[imagelayers]: https://imagelayers.io/?images=janeczku/alpine-kubernetes:3.3
 
 The Alpine-Kubernetes base image enables deployment of Alpine Linux micro-service containers in Kubernetes, Consul, Tutum or other Docker cluster environments that use DNS-based service discovery and rely on the containers ability to qualify service names using the `search` domains from `resolv.conf`.
 
