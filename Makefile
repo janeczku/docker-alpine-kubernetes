@@ -1,6 +1,8 @@
 # Makefile for the Docker image janeczku/alpine-kubernetes
 # MAINTAINER: Jan Broer <janeczku@yahoo.com>
 
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
 .PHONY: all build release test
 
 IMAGE = janeczku/alpine-kubernetes
