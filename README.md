@@ -2,9 +2,9 @@
 # Alpine-Kubernetes base image
 
 [![CircleCI](https://img.shields.io/circleci/project/janeczku/docker-alpine-kubernetes.svg)][circleci]
-[![ImageLayers Size](https://img.shields.io/badge/ImageLayers-5%20MB%20%2F%206%20Layers-blue.svg?maxAge=2592000)][imagelayers]
-[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?maxAge=2592000)][hub]
-[![License](https://img.shields.io/github/license/janeczku/docker-alpine-kubernetes.svg?maxAge=2592000)]()
+[![ImageLayers Size](https://img.shields.io/badge/ImageLayers-5%20MB%20%2F%206%20Layers-blue.svg?maxAge=8600)][imagelayers]
+[![Docker Pulls](https://img.shields.io/docker/pulls/janeczku/alpine-kubernetes.svg?maxAge=8600)][hub]
+[![License](https://img.shields.io/github/license/janeczku/docker-alpine-kubernetes.svg?maxAge=8600)]()
 
 [circleci]: https://circleci.com/gh/janeczku/docker-alpine-kubernetes
 [hub]: https://hub.docker.com/r/janeczku/alpine-kubernetes/
