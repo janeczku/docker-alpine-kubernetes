@@ -7,12 +7,12 @@ dependencies:
     - docker info
     - make build
     - docker images
-
-checkout:
-    post:
-        - git config user.name "Circle CI Build Bot"
-        - git config user.email "no-reply@circleci.com"
-        - git remote -v
+  post:
+    - git config user.name "Circle CI Build Bot"
+    - git config user.email "no-reply@circleci.com"
+    - git remote -v
+    - git fetch --tags
+    - git describe --abbrev=0 --tags
 
 test:
   override:
