@@ -1,0 +1,12 @@
+#!/usr/bin/execlineb -P
+
+with-contenv
+backtick -D "" -n ALPINE_NO_RESOLVER { printcontenv ALPINE_NO_RESOLVER }
+importas -u ALPINE_NO_RESOLVER ALPINE_NO_RESOLVER
+ifelse { s6-test -n ${ALPINE_NO_RESOLVER} }
+{
+	fdmove -c 2 1
+	/sbin/kubernetes_multi_pod.sh
+}
+fdmove -c 2 1
+go-dnsmasq --default-resolver --append-search-domains --hostsfile=/etc/hosts

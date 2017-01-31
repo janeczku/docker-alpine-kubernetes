@@ -6,7 +6,7 @@ SHELL := bash
 .PHONY: all build release test
 
 IMAGE = janeczku/alpine-kubernetes
-VERSIONS = 3.2 3.3
+VERSIONS = 3.2 3.3 3.5
 VERSION =
 
 ifdef CIRCLE_BUILD_NUM
@@ -29,7 +29,7 @@ build:
 do/build:
 	@echo "=> building $(IMAGE):$(VERSION)-$(BUILD_NUM)"
 	docker build -t $(IMAGE):$(VERSION) -f versions/$(VERSION)/Dockerfile .
-	docker tag -f $(IMAGE):$(VERSION) $(IMAGE):$(VERSION)-$(BUILD_NUM)
+	docker tag $(IMAGE):$(VERSION) $(IMAGE):$(VERSION)-$(BUILD_NUM)
 
 test:
 	@$(foreach var,$(VERSIONS),$(MAKE) do/test VERSION=$(var);)
@@ -55,4 +55,4 @@ git-tag:
 	git push -f --tags
 
 do/tag-latest:
-	docker tag -f $(IMAGE):$(VERSION) $(IMAGE):latest
+	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
