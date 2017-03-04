@@ -1,3 +1,5 @@
+**Deprecated:** This image is no longer maintained as Alpine Linux 3.4+ supports search domains in resolv.conf. 
+
 
 # Alpine-Kubernetes base image
 
